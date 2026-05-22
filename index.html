@@ -766,6 +766,37 @@
             border-radius: 2px;
             font-weight: bold;
         }
+   /* ====== 鳴市：寫實地理戰術地圖 ====== */
+.ming-map-mainframe {
+    width: 100%; max-width: 850px; margin: 0 auto 60px;
+    background: #020617; /* 深海夜色 */
+    position: relative; aspect-ratio: 1.2 / 1;
+    border: 2px solid #1e293b; border-radius: 12px;
+    overflow: hidden;
+}
+/* 海洋背景 */
+.ming-map-mainframe::after {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 25%;
+    background: linear-gradient(to bottom, #0f172a, #020617);
+    z-index: 1;
+}
+.map-svg-layer { width: 100%; height: 100%; z-index: 2; position: relative; }
+
+/* 勢力版塊樣式 */
+.hud-polygon { fill-opacity: 0.25; stroke-width: 2; transition: 0.3s; cursor: pointer; }
+.hud-polygon:hover { fill-opacity: 0.45; stroke-width: 4; }
+
+/* 據點點位 (小圓點) */
+.map-dot {
+    fill: #fff; filter: drop-shadow(0 0 5px white); cursor: pointer;
+}
+.map-text {
+    fill: white; font-size: 24px; font-family: 'Noto Serif TC', serif;
+    font-weight: bold; pointer-events: none; text-shadow: 1px 1px 2px #000;
+}
+
+                         
+         
 
         /* ====== 東洲會專屬：月相·暗夜秩序排版 ====== */
         .dongzhou-container {
@@ -2885,6 +2916,64 @@
             background: rgba(30, 41, 59, 0.5); border: 1px dashed #475569; padding: 15px;
         }
         .octb-relation-name { color: #93c5fd; font-weight: bold; font-size: 1rem; border-bottom: 1px solid #334155; padding-bottom: 5px; margin-bottom: 10px; }
+        
+                /* ====== 灰港擴充包：各倉詳細資料覆蓋層 ====== */
+        .wh-overlay-wrapper {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10, 15, 20, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 3000; overflow-y: auto;
+            opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+        }
+        .wh-overlay-wrapper.active {
+            opacity: 1; pointer-events: auto;
+        }
+        .wh-close-btn {
+            position: fixed; top: 20px; right: 30px;
+            background: rgba(0,0,0,0.5); border: 1px solid #f59e0b; color: #f59e0b;
+            padding: 8px 15px; cursor: pointer; font-family: monospace; letter-spacing: 2px;
+            transition: 0.3s; z-index: 3010;
+        }
+        .wh-close-btn:hover { background: #f59e0b; color: #000; }
+        
+        .wh-content-container {
+            max-width: 850px; margin: 80px auto 60px; padding: 40px;
+            background: #111827; border: 2px solid #f59e0b;
+            box-shadow: 0 0 40px rgba(245, 158, 11, 0.15);
+            position: relative; font-family: 'Noto Serif TC', serif; color: #d1d5db;
+        }
+        /* 北倉專屬警戒線裝飾 */
+        .wh-content-container::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 8px;
+            background: repeating-linear-gradient(-45deg, #f59e0b, #f59e0b 15px, #000 15px, #000 30px);
+        }
+        .wh-header {
+            text-align: center; border-bottom: 1px dashed #4b5563; padding-bottom: 20px; margin-bottom: 30px;
+        }
+        .wh-header h2 {
+            font-size: 2.5rem; color: #f59e0b; margin: 0 0 10px 0; letter-spacing: 8px;
+            text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);
+        }
+        .wh-section-title {
+            color: #fff; font-size: 1.3rem; border-left: 4px solid #f59e0b;
+            padding-left: 15px; margin: 40px 0 20px; letter-spacing: 2px; background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent);
+        }
+        .wh-text-block { line-height: 1.8; margin-bottom: 15px; font-size: 1.05rem; }
+        .wh-member-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
+        
+        .wh-member-card {
+            background: rgba(0, 0, 0, 0.4); border: 1px solid #374151; padding: 25px; transition: 0.3s;
+        }
+        .wh-member-card:hover { border-color: #f59e0b; transform: translateY(-3px); }
+        .wh-member-card h4 {
+            color: #f8fafc; font-size: 1.2rem; margin-top: 0; border-bottom: 1px solid #4b5563;
+            padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: baseline; justify-content: space-between;
+        }
+        .wh-member-card h4 span { font-size: 0.85rem; color: #f59e0b; font-family: monospace; }
+        .wh-member-card ul { padding-left: 20px; line-height: 1.8; margin: 0; }
+        .wh-member-card li { margin-bottom: 8px; }
+        .wh-member-card b { color: #fcd34d; }
+
 
     </style>
 </head>
@@ -3128,6 +3217,8 @@
                     </div>
 
                     <div class="page-title reveal" style="margin-top:80px;">鳴市地段 ❘ DISTRICTS</div>
+                                                  
+                                              
 
                     <div class="district-card reveal">
                         <span class="district-tag">東區 ❘ 東洲會／鏡流</span>
@@ -3284,10 +3375,10 @@
                             <table class="huoyin-table">
                                 <thead>
                                     <tr>
-                                        <th>道號稱謂</th>
-                                        <th>俗家姓名</th>
-                                        <th>職責性質</th>
-                                        <th>現狀批註</th>
+                                        <th>稱謂</th>
+                                        <th>俗名</th>
+                                        <th>職責</th>
+                                        <th>現狀</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -3931,7 +4022,7 @@
                                         <div class="cyber-card">
                                             <h4>▸ 習 慣 <span>Habits</span></h4>
                                             <ul>
-                                                <li>咖啡因成癮，靠大量黑咖啡維持專注</li>
+                                                <li>可樂因成癮，靠大量可樂維持專注，長期攝取會手抖</li>
                                                 <li>對電子設備有極高潔癖，不允許他人觸碰</li>
                                                 <li><span style="color:#f3f4f6;">會默默在團隊通訊載具加裝安全程式或追蹤器</span></li>
                                                 <li>對家庭往事不願多提</li>
@@ -3941,7 +4032,7 @@
 
                                     <div class="cyber-card" style="margin-top:20px; border-style:dashed;">
                                         <h4>▸ 背景軌跡 <span>Background</span></h4>
-                                        <p style="margin-bottom: 10px;">家中經營小型電子零件工廠。大二那年，工廠因廠商惡意詐騙倒閉受到巨大牽連，家庭經濟瞬間崩潰。為分擔家計並查清真相，他輟學一頭栽進網路世界。</p>
+                                        <p style="margin-bottom: 10px;">是有高功能自閉症的天才。家中經營小型電子零件工廠。大二那年，工廠因廠商惡意詐騙倒閉受到巨大牽連，家庭經濟瞬間崩潰。為分擔家計並查清真相，他輟學一頭栽進網路世界。</p>
                                         <p style="color:#22d3ee; border-left: 2px solid #00ffff; padding-left: 15px;">憑天賦自學成才，在網咖接灰色黑客工作維生，也藉此挖出了當年陷害家中的幕後黑手資訊。深知憑一己之力難以撼動，遂將此事深埋心底。</p>
                                         <p style="margin-top:10px;">後被白先生發掘並引薦給沙祁川。沙祁川邀請他加入初建的灰港——一個能發揮所長、且有強大後盾的平台。</p>
                                         <p style="color:#6b7280; font-size:0.85rem; border-top:1px dashed rgba(0,255,255,0.1); padding-top:10px; margin-top:10px;">【註】：暗中資助關係不錯的表弟學費，是他與正常世界為數不多的溫情聯繫。</p>
@@ -5596,40 +5687,70 @@
 
                     <div class="hg-section-title">肆 · 八狼 </div>
                     <p style="margin-bottom:20px; color:#d1d5db;">核心執行層，平級互不隸屬。各領一個分倉，直接向沙祁川與白先生匯報。守則：「任務至上，個人不存在，恩怨不帶入任務。」</p>
-                    <div class="hg-grid">
-                        <div class="hg-card">
+                                            <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #f59e0b;" onclick="openWarehouse('wh-north')">
                             <h4>北倉 <span>陳峻傑 ❘ 爆破</span></h4>
                             <p>八狼之首。隱藏於赤影勢力的報廢化工廠地下。爆破天才，將破壞變成精密的藝術。曾言：「我的東西只炸任務目標。你的東西，不一定。」</p>
+                            <div style="text-align: right; margin-top: 15px; color: #f59e0b; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card">
+
+                                               <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #6b7280;" onclick="openWarehouse('wh-south')">
                             <h4>南倉 <span>高天龍 ❘ 打手</span></h4>
                             <p>表面是拳館，地下是近身戰訓練場。不追求格鬥家風範，只求最直接的壓制。曾給衡門遞名片：「此處不沾生意，只接任務。井水不犯河水。」</p>
+                            <div style="text-align: right; margin-top: 15px; color: #6b7280; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card">
+
+                                               <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #06b6d4;" onclick="openWarehouse('wh-east')">
                             <h4>東倉 <span>林佑熙 ❘ 技術</span></h4>
                             <p>唯一不隱藏的合法科技公司。地下是電子作戰中心。銀灰色防火牆機櫃排列如碑林，與鏡流有默契的技術合作。</p>
+                            <div style="text-align: right; margin-top: 15px; color: #06b6d4; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card">
+
+                                               <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #d946ef;" onclick="openWarehouse('wh-west')">
                             <h4>西倉 <span>周逸宇 ❘ 情報聯絡</span></h4>
                             <p>隱於紅燈區。灰港與外界唯一的窗口。能記住上百條零碎情報與假名對應，洛熠梵稱他為「鳴市的黃頁」。</p>
+                            <div style="text-align: right; margin-top: 15px; color: #d946ef; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card">
+
+                                               <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #10b981;" onclick="openWarehouse('wh-northeast')">
                             <h4>東北倉 <span>吳諾昊 ❘ 偵查</span></h4>
-                            <p>位於反黑組總部大樓正對面。微型軍事綜合體。成員是一群「不再需要國籍」的人（不招募東歐體系）。每天在對面看著警方，而警方渾然不覺。</p>
+                            <p>位於反黑組總部大樓正對面。微型軍事綜合體。成員是一群「不再需要國籍」的人。每天在對面看著警方，而警方渾然不覺。</p>
+                            <div style="text-align: right; margin-top: 15px; color: #10b981; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card">
+
+                                                <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #f59e0b;" onclick="openWarehouse('wh-southeast')">
                             <h4>東南倉 <span>陳紹慶 ❘ 後勤</span></h4>
                             <p>灰港後勤中樞。負責武器補給、車輛調度、醫療與偽造身份。倉庫如巨型迷宮，所有「看不見的背後環節」皆由他掌控。</p>
+                            <div style="text-align: right; margin-top: 15px; color: #f59e0b; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card">
+
+                                               <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #dc2626;" onclick="openWarehouse('wh-southwest')">
                             <h4>西南倉 <span>陸永濤 ❘ 清理</span></h4>
                             <p>最隱秘的倉位。負責現場清理、屍體處理、數據徹底銷毀。確保任務像從未發生過。據說存放著所有「不曾發生的兇案」檔案。</p>
+                            <div style="text-align: right; margin-top: 15px; color: #dc2626; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                        <div class="hg-card" style="border-color: #6b7280; background: rgba(31, 41, 55, 0.8);">
+
+                                               <div class="hg-card" style="cursor: pointer; border-bottom: 2px solid #b91c1c; background: rgba(31, 41, 55, 0.8);" onclick="openWarehouse('wh-northwest')">
                             <h4>西北倉 <span>程磊 ❘ 鎮壓</span></h4>
                             <p>廢棄軍事訓練場。「黑手套中的黑手套」，僅內部知曉。當任務失控需要絕對武力壓制時出動。鎖定、壓制、摧毀，然後交由西南倉清理。</p>
+                            <div style="text-align: right; margin-top: 15px; color: #b91c1c; font-size: 0.85rem; letter-spacing: 2px;">
+                                [+] 點擊查閱機密檔案
+                            </div>
                         </div>
-                    </div>
+
                     <p style="text-align:center; color:#f87171; margin-top:20px; font-size:0.9rem;">【底層紅線】永遠不接自己人的單。拒絕委託，並標記為不可接。</p>
 
                     <div class="hg-section-title">伍 · 服務範疇 </div>
@@ -6131,6 +6252,743 @@
 
 
     </main>
+        <!-- ====== 灰港分倉詳細資料覆蓋層 ====== -->
+    <div id="warehouse-overlay" class="wh-overlay-wrapper">
+        <button class="wh-close-btn" onclick="closeWarehouse()">[ ESC ] 關閉檔案</button>
+        
+        <!-- 北倉詳細資料 -->
+        <div id="wh-north" class="wh-content-container" style="display:none;">
+            <div class="wh-header">
+                <div style="font-family: monospace; color:#f59e0b; letter-spacing:3px; margin-bottom:10px;">> ACCESS_GRANTED // NORTH_WAREHOUSE</div>
+                <h2>北 倉</h2>
+                <span style="color:#9ca3af; letter-spacing:5px;">巨星特效與舞台煙火工程公司</span>
+            </div>
+
+            <div class="wh-section-title">一、 倉儲架構與運作邏輯</div>
+            <p class="wh-text-block">北倉表面上是一家位於北區邊緣、佔地極廣的「巨星特效與舞台煙火工程公司」。白天卡車進出頻繁，堆滿鋼架與合法申報的民用煙花材料，甚至承接鳴市部分商演的舞台特效，是極完美的掩護。但在地下與核心庫房，這裡是鳴市最恐怖的「火藥庫」與「戰術推演室」。</p>
+            
+            <div style="background: rgba(245, 158, 11, 0.05); border-left: 3px solid #f59e0b; padding: 20px; margin: 20px 0;">
+                <h4 style="color:#fcd34d; margin-top:0; margin-bottom:10px;">■ 內部雙軌制指揮鏈</h4>
+                <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                    <li><b>戰術與現場（雷隼負責）：</b> 阿傑不在或不願動手時，雷隼擁有絕對現場指揮權，負責將阿傑華麗的「構想」轉化為精準的「陷阱」。</li>
+                    <li><b>技術與後勤（白磷 / 潘趣負責）：</b> 負責調配火藥、研發新裝備與安全管理（畢竟天天在火藥堆裡生活，安全防護至關重要）。</li>
+                </ul>
+            </div>
+
+            <div class="wh-section-title">二、 直屬部下 ❘ 核心成員檔案</div>
+            <div class="wh-member-grid">
+                
+                <div class="wh-member-card">
+                    <h4>雷隼 <span>北倉坐館 / 親傳徒弟</span></h4>
+                    <ul>
+                        <li><b>外貌氣質：</b> 臉有淡灼傷疤，眼神銳利帶痞氣。對自己人及北區街坊異常溫和客氣，常在茶餐廳吹水。</li>
+                        <li><b>戰術風格：</b> 溫和只留給自己人。完美繼承阿傑的戰術頭腦，但更偏向「狩獵」。擅長心理戰，故意留破綻引敵入死胡同，再引爆隱蔽死角的<b>黏著性連鎖炸彈</b>。</li>
+                        <li><b>習慣：</b> 任務前嚼雙倍薄荷糖。「嘴裡夠涼，腦袋才不會被火藥熱度沖昏。」</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card">
+                    <h4>白磷 <span>縱火專家 / 煙花藝術家</span></h4>
+                    <ul>
+                        <li><b>性格特點：</b> 瘋批美人。人際關係冷漠，輕微強迫症。提到「化學劑調配」與「火焰顏色」會異常亢奮。</li>
+                        <li><b>技術特長：</b> 嫌棄市面燃燒彈，全手工熬製化學劑。能精準控制火勢蔓延與溫度。得意之作是能產生五彩火焰的「極光燃燒劑」。</li>
+                        <li><b>戰術定位：</b> 大範圍戰術封路與現場證據的「初級高溫銷毀」。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card">
+                    <h4>潘趣 <span>爆炸物拆解 / 驚喜製造者</span></h4>
+                    <ul>
+                        <li><b>外貌特點：</b> 身材魁梧，滿臂文身。看似粗魯打手，實則心細如髮，雙手穩如外科機器。</li>
+                        <li><b>技術特長：</b> 天生對機械電子敏感。拆彈不靠儀器，靠一根針與對滴答聲的直覺。喜歡將拆下的材料改造成<b>「驚喜禮盒」</b>（如高檔雪茄盒定向炸彈），專送不守規矩的委託人。</li>
+                        <li><b>語錄：</b> 「剪紅線還是藍線？小孩子才做選擇，我通常直接把引信拔了。」</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card">
+                    <h4>哨 <span>聲波與震動感知 / 北倉之眼</span></h4>
+                    <ul>
+                        <li><b>性格特點：</b> 戴巨大降噪耳機，內向孤僻。聽覺與震動敏感度異於常人。</li>
+                        <li><b>戰術定位：</b> 爆破前的絕對核心。赤腳踩地能感知百米內地下水流或建築裂縫。報告精確至：「東側柱子打入鋼釘，50克C4就能讓整樓向西傾倒」。</li>
+                        <li><b>日常：</b> 討厭喧鬧與市區喇叭聲，只在北倉地下室能放鬆。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card">
+                    <h4>悶雷 <span>定向爆破專家</span></h4>
+                    <ul>
+                        <li><b>外貌特點：</b> 老實巴交的中年大叔，負責開卡車與搬運，丟在人群裡一秒消失。</li>
+                        <li><b>技術特長：</b> 追求「極致的安靜」。專精低爆速炸藥與膨脹水泥，擅長<b>「靜默爆破」</b>。</li>
+                        <li><b>戰績：</b> 曾在目標隔壁房間動手炸塌承重牆，目標仍在睡夢中未醒，報警器未響。江湖人稱「拆樓不帶響，閻王給點讚」。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card">
+                    <h4>煙術 <span>煙霧與視覺干擾師</span></h4>
+                    <ul>
+                        <li><b>外貌特點：</b> 穿著時尚的夜店浪子，隨身帶電子菸，擅長魔術。</li>
+                        <li><b>技術特長：</b> 調配的煙霧彈不僅遮擋視線，更含金屬微粒與磁性物質，能癱瘓紅外線熱成像與現代黑客監控系統。</li>
+                        <li><b>戰術定位：</b> 撤退時的「魔術幕布」。掩護北倉小隊在濃煙中幽靈般消失。</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="wh-section-title">三、 江湖潛規則與獨特業務</div>
+            <div style="background: rgba(0,0,0,0.5); border: 1px solid #374151; padding: 25px;">
+                <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                    <li style="margin-bottom:15px;"><b>「不炸活人」原則：</b> 原則上不承接純粹的「暗殺委託」。爆破委託多為：摧毀敵對毒品倉庫、炸毀關鍵帳目保險庫、癱瘓電網或偽造意外火災。他們追求「用最少的炸藥，達到最震撼或最隱蔽的效果」，且絕對不傷及沙祁川底線外的無辜者。</li>
+                    <li style="margin-bottom:15px;"><b>與「赤影」的默契：</b> 北區是赤影天下。北倉在北區動手前，雷隼必送一盒「特製煙花（實為高檔雪茄或情報）」給赤影頭目，暗示「今晚有煙花秀，請兄弟別看熱鬧」。此規矩讓北倉在北區穩如泰山。</li>
+                    <li><b style="color:#f59e0b;">特殊裝備「灰港特製音樂盒」：</b> 阿傑與東倉林佑熙的合作產物。外表為精美復古八音盒，播放到最後一個音符時釋放高溫高壓爆破，專用於高端「清理門戶」委託。</li>
+                </ul>
+            </div>
+        </div>
+
+               <div id="wh-south" class="wh-content-container" style="display:none; border-color: #4b5563;">
+            <div class="wh-header" style="border-bottom-color: #374151;">
+                <div style="font-family: monospace; color:#9ca3af; letter-spacing:3px; margin-bottom:10px;">> ACCESS_GRANTED // SOUTH_WAREHOUSE</div>
+                <h2 style="color:#d1d5db; text-shadow: 0 0 15px rgba(156, 163, 175, 0.5);">南 倉</h2>
+                <span style="color:#9ca3af; letter-spacing:5px;">遠洋廢鋼回收與重型船舶拆解廠</span>
+            </div>
+
+            <div class="wh-section-title" style="border-left-color: #6b7280; background: linear-gradient(90deg, rgba(107, 114, 128, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+            <p class="wh-text-block">南倉表面上是一家位於南區老工業街區的「遠洋廢鋼回收與重型船舶拆解廠」。這裡終日響著金屬撞擊的巨響、電焊的火花與重型吊車的轟鳴。這地方完美的掩護了這群力量怪物的日常：他們徒手撕裂廢汽車、用百公斤的實心鐵球當健身器材。外界以為這裡只是一群靠力氣吃飯的碼頭苦力，實際上這裡是灰港最強硬的「地面防線」。</p>
+            
+            <div style="background: rgba(75, 85, 99, 0.1); border-left: 3px solid #6b7280; padding: 20px; margin: 20px 0;">
+                <h4 style="color:#d1d5db; margin-top:0; margin-bottom:10px;">■ 內部指揮鏈：叢林法則</h4>
+                <p style="color:#9ca3af; margin-bottom: 10px; font-size: 0.95rem;">高天龍（阿龍）是南倉的絕對圖騰。南倉的運作極度崇尚「實力至上」：</p>
+                <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                    <li><b>現場指揮（鐵壁負責）：</b> 作為坐館，負責日常委託分配。成員對他的戰術絕對服從——因為他是唯一能正面抗下阿龍三拳而不倒的人。</li>
+                    <li><b>日常訓練（血牛 / 鬣狗負責）：</b> 不配備高科技健身房，訓練就是在拆車廠進行高強度的「極限負重」與「無防具對打」，確保不依賴槍械依然擁有恐怖致死率。</li>
+                </ul>
+            </div>
+
+            <div class="wh-section-title" style="border-left-color: #6b7280; background: linear-gradient(90deg, rgba(107, 114, 128, 0.1), transparent); color: #e5e7eb;">二、 直屬部下 ❘ 核心成員檔案</div>
+            <p style="color:#9ca3af; margin-bottom: 20px;">當別的堂口出動幾十隻「爛命仔」拿西瓜刀砍人時，南倉通常只派這六個人，就能像重裝坦克一樣鑿穿敵方百人的防線。</p>
+            
+            <div class="wh-member-grid">
+                
+                <div class="wh-member-card" style="border-color: #4b5563;">
+                    <h4>鐵壁 <span>南倉坐館 / 親傳徒弟</span></h4>
+                    <ul>
+                        <li><b>外貌氣質：</b> 近兩米高，如鐵塔般，常穿沾滿機油的厚重皮圍裙。性格沉穩寡言，不怒自威，像塊花崗岩。</li>
+                        <li><b>冷兵器戰術：</b> 專屬武器是報廢破冰船軸承鋼打造的<b>「八角重型玄鐵大鐧」</b>(45公斤)。信奉「一力降十會」，正面推進砸碎一切花哨走位。</li>
+                        <li><b>習慣：</b> 不穿現代防彈衣（會限制肌肉爆發），雙臂纏上厚重的卡車輪胎鋼絲圈作防具。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card" style="border-color: #4b5563;">
+                    <h4>破城槌 <span>正面突破專家</span></h4>
+                    <ul>
+                        <li><b>性格特點：</b> 脾氣暴躁，嚴重路怒症，極度討厭「門」和「牆」這類阻擋物。</li>
+                        <li><b>技術特長：</b> 人肉攻城機器。肩膝老繭厚如皮革。隨身帶<b>氣動輔助破門重槌</b>。防盜鋼門或三連磚牆都能強行開路。</li>
+                        <li><b>軼事：</b> 曾因忘帶鑰匙，直接把宿舍承重牆撞了個窟窿進去拿外套。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card" style="border-color: #4b5563;">
+                    <h4>戰錘 <span>鈍器戰術師</span></h4>
+                    <ul>
+                        <li><b>外貌特點：</b> 唏噓鬍渣配馬尾，像落魄重金屬樂手。實為冷兵器瘋子，對鈍器配重與風阻有病態追求。</li>
+                        <li><b>技術特長：</b> 擅用<b>複合鏈錘與長柄戰錘</b>。鏈錘如黑色旋風，能鎖死敵方槍管四肢。</li>
+                        <li><b>戰術風格：</b> 力量極陰狠，專打關節、肋骨與頭盔。中擊者表面無傷，內臟骨骼早已粉碎。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card" style="border-color: #4b5563;">
+                    <h4>鬣狗 <span>纏鬥與追擊專家</span></h4>
+                    <ul>
+                        <li><b>外貌氣質：</b> 瘦削但滿身鋼條肌肉。短髮毛糙，眼神神經質且充滿攻擊性。</li>
+                        <li><b>戰術定位：</b> 南倉唯一的「刺客」。耐力超越馬拉松選手，極端負重下可全速奔跑數小時。</li>
+                        <li><b>戰術風格：</b> 擅長「放血戰術」，用兩把<b>鋸齒狀開山短斷刀</b>黏上目標不斷撕咬，直到目標失血體力崩潰。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card" style="border-color: #4b5563;">
+                    <h4>血牛 <span>終極肉盾 (Blood Beef)</span></h4>
+                    <ul>
+                        <li><b>性格特點：</b> 智商不高，單純憨厚，對痛覺極度遲鈍，是南倉的大哥哥。</li>
+                        <li><b>身體異能：</b> 肌肉密度與骨骼硬度遠超常人。曾無麻醉徒手摳出體內子彈，傷口一週內完全癒合。</li>
+                        <li><b>戰術定位：</b> 活體盾牌。持裝甲車防彈鋼板改裝的<b>「巨型方盾」</b>。衝鋒抗火力，撤退擋圍剿。</li>
+                    </ul>
+                </div>
+
+                <div class="wh-member-card" style="border-color: #4b5563;">
+                    <h4>膛壓 <span>關節破壞專家</span></h4>
+                    <ul>
+                        <li><b>外貌氣質：</b> 面容冷艷，愛穿緊身格鬥服。戰鬥時散發毛骨悚然的掠食者氣息。</li>
+                        <li><b>技術特長：</b> 專精「短距瞬時爆發力」(一寸勁)。不使用長兵器，僅戴<b>鈦合金指節套與短鐵尺</b>。</li>
+                        <li><b>戰術風格：</b> 貼身短打與擒拿，將全身力量集中一點引爆。被近身者一秒內即斷頸椎或粉碎髕骨。</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class="wh-section-title" style="border-left-color: #6b7280; background: linear-gradient(90deg, rgba(107, 114, 128, 0.1), transparent); color: #e5e7eb;">三、 南區生存智慧與江湖規矩</div>
+            <div style="background: rgba(0,0,0,0.5); border: 1px solid #374151; padding: 25px;">
+                <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                    <li style="margin-bottom:15px;"><b>「以力破巧」的哲學：</b> 雖然南區是衡門（高科技軍火）的勢力範圍，但南倉反其道而行，堅持冷兵器與肉體極限。阿龍名言：<b style="color:#f3f4f6;">「子彈有打光的時候，晶片有被燒的時候，但老子的拳頭永遠不會卡殼。」</b></li>
+                    <li style="margin-bottom:15px;"><b>與「衡門」的微妙平衡：</b> 井水不犯河水。南倉承接了衡門「不方便開槍」的髒活。在鳴市開槍會引來反黑組，而南倉用冷兵器造成的「幫派鬥毆」或「工業意外」，更能掩人耳目。</li>
+                    <li><b style="color:#ef4444;">南倉的鐵律：</b> <b>「拳頭不向弱者開」</b>。南倉極講究傳統江湖規矩，欺負街坊、收保護費、販毒在南倉是死罪。踩線者，會被阿龍親手砸進廢鋼壓塊機裡。</li>
+                </ul>
+            </div>
+        </div>
+                <div id="wh-east" class="wh-content-container" style="display:none; border-color: #06b6d4; background: #0a0f19;">
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background-image: linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px); background-size: 100% 4px; pointer-events: none; z-index: 0;"></div>
+            
+            <div class="wh-header" style="border-bottom-color: rgba(6, 182, 212, 0.3); position: relative; z-index: 1;">
+                <div style="font-family: monospace; color:#06b6d4; letter-spacing:3px; margin-bottom:10px;">> SYSTEM_OVERRIDE // EAST_WAREHOUSE_CONNECTED</div>
+                <h2 style="color:#e0f2fe; text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);">東 倉</h2>
+                <span style="color:#22d3ee; letter-spacing:5px;">微秒數字矩陣 (MDM) 科技公司</span>
+            </div>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="wh-section-title" style="border-left-color: #00ffff; background: linear-gradient(90deg, rgba(0, 255, 255, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+                <p class="wh-text-block">東倉表面上是一家位於鳴市市中心黃金地段的高端甲級寫字樓企業——<b style="color:#22d3ee;">「微秒數字矩陣（Microsecond Digital Matrix）科技公司」</b>。這裡出入的都是穿著襯衫、掛著工牌、喝著冰美式的科技精英。這裡甚至常年招收名牌大學的實習生，是灰港唯一一個完全合法、甚至按時納稅的分倉。</p>
+                <p class="wh-text-block">然而，在公司最深處、需要通過虹膜與掌紋三重認證的<b>地下五層</b>，則是直通鳴市海底光纜的<b style="color:#22d3ee;">「電子作戰中心」</b>。這裡整面牆都是滾動的代碼與全城監控投影，伺服器發出的低鳴如同巨獸的呼吸。</p>
+                
+                <div style="background: rgba(6, 182, 212, 0.05); border: 1px solid rgba(6, 182, 212, 0.3); border-left: 4px solid #00ffff; padding: 20px; margin: 20px 0;">
+                    <h4 style="color:#22d3ee; margin-top:0; margin-bottom:10px; font-family: monospace;">[ 內部指揮鏈 : 雙核運作 ]</h4>
+                    <p style="color:#94a3b8; margin-bottom: 10px; font-size: 0.95rem;">林佑熙（阿熙）在團隊中是接近神明般的存在（熙神）。但他本人極度懶散，日常多以全息投影或語音代號現身，具體的事務採取雙核心運作：</p>
+                    <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li><b style="color:#00ffff;">技術總調度（鍵魂負責）：</b> 作為坐館，負責所有技術攻防的排兵布陣，也是面對物理威脅時的最後一道防線。</li>
+                        <li><b style="color:#00ffff;">情報與外聯（鍵靈負責）：</b> 負責將冷冰冰的數據轉化為江湖上能用的「籌碼」，並打理與東洲會、鏡流的微妙關係。</li>
+                    </ul>
+                    <p style="color:#94a3b8; margin-top: 10px; font-size: 0.9rem;">> 如果遇到需要物理接入的死局，則由<b>晶振</b>攜帶特製硬件潛入現場。</p>
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #00ffff; background: linear-gradient(90deg, rgba(0, 255, 255, 0.1), transparent); color: #e5e7eb;">二、 直屬部下 ❘ 核心成員檔案</div>
+                
+                <div class="wh-member-grid">
+                    
+                    <div class="wh-member-card" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(6, 182, 212, 0.3);">鍵魂 <span>東倉坐館 / 親傳徒弟</span></h4>
+                        <ul>
+                            <li><b>外貌氣質：</b> 戴無框眼鏡，像溫和帶黑眼圈的疲憊程序員。雙手修長，敲鍵盤快到留殘影。</li>
+                            <li><b>戰術風格：</b> 全能戰術大師。隨身帶偽裝成高檔鋼筆的<b>高頻電磁脈衝發生器(EMP)</b>。被仇家找上門時，能駭入大樓自動防禦、電梯與照明，利用環境活活困死敵人。</li>
+                            <li><b>習慣：</b> 寫代碼或指揮時必聽巴哈鋼琴曲，認為古典樂邏輯等同完美代碼。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(6, 182, 212, 0.3);">鍵靈 <span>二把手 / 社交工程專家</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 鍵魂的親妹妹。幹練姬髮式，精緻御姐妝。擅用各種身份(名媛、秘書、清潔工)出入高端場所。</li>
+                            <li><b>江湖手段：</b> 「讀心者」。信奉<b>「最容易被攻破的不是防火牆，而是人心」</b>。能通過一條動態、一個眼神精準側寫心理弱點，設計完美「魚叉式網路釣魚」，讓目標心甘情願交出權限。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(6, 182, 212, 0.3);">晶振 <span>物理破壁人 / 硬件專家</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 耀眼工業風短髮，掛滿微型螺絲刀、電烙鐵與嗅探晶片。性格風風火火。</li>
+                            <li><b>技術特長：</b> 專治「絕對斷網(Air-Gapped)」數據庫。精通電子鎖破解、信號監聽與硬件改裝。能把監聽晶片偽裝成LED燈珠，或用微型無人機將吸附式路由器貼在目標大樓外牆。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(6, 182, 212, 0.3);">林窗 <span>漏洞獵手 / 零日挖掘者</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 深度宅男，極度社恐。除對代碼外，與團隊溝通只發表情包。</li>
+                            <li><b>技術特長：</b> 東倉的「戰略武器庫」。專注在全球系統尋找未公開的<b>「零日漏洞」</b>。掌握數十個能瞬間癱瘓鳴市地鐵、電力或銀行的「核按鈕」。</li>
+                            <li><b>江湖評價：</b> 「林窗一笑，鳴市半個市中心的服務器都要冒煙。」</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(6, 182, 212, 0.3);">零日 <span>網絡刺客 / 攻擊手</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 朋克少女，嚼泡泡糖，性格乖張。代碼風格極其激進、狂暴，充滿毀滅性。</li>
+                            <li><b>戰術定位：</b> 負責致命一擊。當林窗找到漏洞、晶振接入硬件，她親操木馬在敵方網絡瘋狂肆虐。篡改洗錢帳目、鎖死保險庫，從不留活口，甚至順手燒毀對方服務器主板。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(6, 182, 212, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(6, 182, 212, 0.3);">矽 <span>數據洗滌師</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 沉穩、冰冷，如同沒有感情的 AI 助手。日常處理極其龐大雜亂的原始數據。</li>
+                            <li><b>技術特長：</b> 將盜取資訊經「大數據清洗」轉化為精準情報。更重要的是<b>「抹除痕跡」</b>。經她手，東倉在網絡上的IP、日誌記錄都會被洗得像從未存在過一樣乾淨。</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #00ffff; background: linear-gradient(90deg, rgba(0, 255, 255, 0.1), transparent); color: #e5e7eb;">三、 東倉生存智慧與多方交易</div>
+                <div style="background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(6, 182, 212, 0.5); padding: 25px;">
+                    <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li style="margin-bottom:15px;"><b>地緣政治的鋼絲舞：</b> 位於東洲會鏡流交界。這塊地盤是朱朔親自批准給灰港的。東倉為東洲會跨境金融提供「軍工級防火牆」；同時向鏡流出售高端情報，在兩大巨頭間達成微妙平衡。<br><span style="font-size: 0.85rem; color: #94a3b8; font-style: italic;">( 內部觀測：且雙方管理人關係似乎不錯 )</span></li>
+                        <li style="margin-bottom:15px;"><b>與北倉的「跨倉聯動」：</b> 常與北倉(阿傑)聯動。東倉遠端黑入大樓消防系統、關閉警報；北倉五分鐘後送上華麗煙花秀。在暗網上被稱為<b style="color:#00ffff;">「水火相融」</b>。</li>
+                        <li><b>東倉的底線：</b> <b style="color:#22d3ee;">「不當造謠者，只當揭露者」</b>。阿熙鐵律：可以盜取情報、癱瘓系統，但絕不允許憑空偽造數據陷害好人。數據是神聖的，黑客也是有尊嚴的。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+                <div id="wh-west" class="wh-content-container" style="display:none; border-color: #d946ef; background: #130a18;">
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 50% 0%, rgba(217, 70, 239, 0.05) 0%, transparent 70%); pointer-events: none; z-index: 0;"></div>
+
+            <div class="wh-header" style="border-bottom-color: rgba(217, 70, 239, 0.3); position: relative; z-index: 1;">
+                <div style="font-family: monospace; color:#d946ef; letter-spacing:3px; margin-bottom:10px;">> ACCESS_GRANTED // WEST_WAREHOUSE</div>
+                <h2 style="color:#fdf4ff; text-shadow: 0 0 15px rgba(217, 70, 239, 0.6);">西 倉</h2>
+                <span style="color:#e879f9; letter-spacing:5px;">常青聯誼會</span>
+            </div>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="wh-section-title" style="border-left-color: #d946ef; background: linear-gradient(90deg, rgba(217, 70, 239, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+                <p class="wh-text-block">西倉隱藏在西區一棟看似隨時會被拆遷的九層舊式唐樓——<b style="color:#e879f9;">「常青聯誼會」</b>內。這裡一樓是通宵達旦的麻將館、二樓是煙霧繚繞的撞球吧、三樓往上則是廉價的港式賓館與出租房。這裡每天都有喝醉的賭徒、拉客的女子、滿身文身的邊緣青年進出。</p>
+                <p class="wh-text-block">但這棟樓的牆壁早就被全部打通，內部機關重重。看似普通的衣櫃拉開是直通後巷的滑道；麻將桌下的暗板能直接通往地下排水道。這裡表面上由西區的市井流氓看管，實則是鳴市最龐大的<b style="color:#e879f9;">「街頭肉眼監控中心」</b>。</p>
+
+                <div style="background: rgba(217, 70, 239, 0.05); border: 1px solid rgba(217, 70, 239, 0.3); border-left: 4px solid #d946ef; padding: 20px; margin: 20px 0;">
+                    <h4 style="color:#e879f9; margin-top:0; margin-bottom:10px;">■ 內部指揮鏈：前店後廠</h4>
+                    <p style="color:#94a3b8; margin-bottom: 10px; font-size: 0.95rem;">周逸宇（阿宇）長年流連於各大夜總會與溫柔鄉，比起揸fit人，他更像一個「交際花」。西倉的實際管理採取「前店後廠」模式：</p>
+                    <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li><b style="color:#f0abfc;">現場與機關調度（紅心負責）：</b> 作為坐館，坐鎮常青聯誼會，負責處理突發江湖恩怨、保護據點安全，並接應暴露的暗線。</li>
+                        <li><b style="color:#f0abfc;">情報網清洗與分析（蠱惑扇負責）：</b> 負責將每天從妓女、泊車仔、乞丐口中收集到的無數「江湖八卦」，梳理成極具商業價值的核心情報。</li>
+                    </ul>
+                    <p style="color:#94a3b8; margin-top: 10px; font-size: 0.9rem;">> 他們最擅長「不戰而屈人之兵」，用幾張照片、一段錄音或一筆賭債，就能逼得一個幫派大佬走投無路。</p>
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #d946ef; background: linear-gradient(90deg, rgba(217, 70, 239, 0.1), transparent); color: #e5e7eb;">二、 直屬部下 ❘ 核心成員檔案</div>
+
+                <div class="wh-member-grid">
+
+                    <div class="wh-member-card" style="border-color: rgba(217, 70, 239, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(217, 70, 239, 0.3);">紅心 <span>西倉坐館 / 親傳徒弟</span></h4>
+                        <ul>
+                            <li><b>外貌氣質：</b> 長相英俊，手指纖長。愛穿洗褪色的魔術師西裝背心。看人眼睛帶笑，手裡永遠切著一副撲克牌。</li>
+                            <li><b>江湖手段：</b> 鳴市最強「千門高手」與開鎖匠。精通障眼法(Sleight of Hand)，擦肩而過便能偷走保險箱鑰匙並塞入仿製品。</li>
+                            <li><b>習慣：</b> 遇危險不掏槍，而是撒出瞬間燃燒強光的<b>「魔術閃光紙」</b>或特製煙霧彈，憑空消失。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(217, 70, 239, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(217, 70, 239, 0.3);">蠱惑扇 <span>心理操控 / 西倉智囊</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 梳油頭戴金絲眼鏡，手拿折扇。混跡茶餐廳與高檔會所，聲音極具磁性與說服力。</li>
+                            <li><b>技術特長：</b> 心理戰大師。不論利誘、恐嚇或情感勒索，幾杯酒便能讓對方吐露秘密。擅長散佈謠言引導敵對幫派內訌。</li>
+                            <li><b>評價：</b> 「寧願得罪南倉的鐵錘，都唔好同蠱惑扇傾多一句話，因為佢連你底褲咩顏色都套得到出來。」</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(217, 70, 239, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(217, 70, 239, 0.3);">鬼燈 <span>夜間情報員 / 風月女王</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 濃妝艷抹性感火辣，是頂級媽媽桑。表面愛錢迎逢，實則眼神冰冷心如止水。</li>
+                            <li><b>戰術定位：</b> 專門收集「枕邊風」。手下一批姑娘專從酒醉的黑道大哥、政客口中套取機密。</li>
+                            <li><b>座右銘：</b> 「男人的秘密，通常都留喺酒精同床單上面。」</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(217, 70, 239, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(217, 70, 239, 0.3);">穿堂風 <span>滲透與逃脫大師</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 身材矮小存在感極低，穿普通連帽衫。長相難以被記住。</li>
+                            <li><b>技術特長：</b> 跑酷與地形大師。對西區唐樓天台、防火巷、地下水管瞭如指掌。被人追殺能利用窄窗瞬間遁走。負責潛入目標住宅安裝竊聽器。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(217, 70, 239, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(217, 70, 239, 0.3);">過山風 <span>街頭獵犬 / 跟蹤專家</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 面黃肌瘦，常騎破舊外賣摩托車扎馬尾。眼神飄忽，性格孤僻。</li>
+                            <li><b>技術特長：</b> 跟蹤出神入化。能化身清潔工、報販潛伏幾天不被察覺。步伐車速「飄忽如蛇」，能死死釘住目標，令反跟蹤高手束手無策。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(217, 70, 239, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(217, 70, 239, 0.3);">街鼠 <span>底層網絡維護者</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 邋遢市井，滿嘴黃牙，游手好閒，跟誰都能稱兄道弟。</li>
+                            <li><b>技術特長：</b> 最龐大的「耳目觸手」。西區乞丐、小販、泊車仔都是線人。任何人踏入西區，特徵行蹤五分鐘內匯總至常青聯誼會。</li>
+                            <li><b>日常：</b> 帶無數零錢劣質香煙，打賞提供線報的街頭流浪漢。</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #d946ef; background: linear-gradient(90deg, rgba(217, 70, 239, 0.1), transparent); color: #e5e7eb;">三、 西倉江湖生存智慧與公關哲學</div>
+                <div style="background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(217, 70, 239, 0.5); padding: 25px;">
+                    <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li style="margin-bottom:15px;"><b>「三不管」地帶的護身符：</b> 西區異常混亂。西倉能站穩是因為掌握所有人秘密（包括署長醜聞、幫派洗錢證據）。西倉不爭地盤，但誰敢動西倉，秘密隔天就會傳遍鳴市。</li>
+                        <li style="margin-bottom:15px;"><b>與東倉的「軟硬情報互補」：</b> 東倉(阿熙)拿冰冷網路數據；西倉(阿宇)拿活生生的人性弱點、情婦名字。兩倉交換，<b style="color:#f0abfc;">暗網數據 + 街頭線報</b>，構成灰港最完美情報網。</li>
+                        <li><b>西倉的底線：</b> <b style="color:#e879f9;">「求財不求命，留人一條生路」</b>。阿宇認為逼死人情報就沒價值了。設局點到為止，拿到東西就收手，甚至會給走投無路的目標一張離開鳴市的船票。這份「盜亦有道」，讓西倉在底層極得人望。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="wh-northeast" class="wh-content-container" style="display:none; border-color: #10b981; background: #0c120f;">
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background-image: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(16, 185, 129, 0.02) 2px, rgba(16, 185, 129, 0.02) 4px); pointer-events: none; z-index: 0;"></div>
+
+            <div class="wh-header" style="border-bottom-color: rgba(16, 185, 129, 0.3); position: relative; z-index: 1;">
+                <div style="font-family: monospace; color:#10b981; letter-spacing:3px; margin-bottom:10px;">> OPERATION_GHOST // NORTHEAST_WAREHOUSE</div>
+                <h2 style="color:#ecfdf5; text-shadow: 0 0 15px rgba(16, 185, 129, 0.5);">東北倉</h2>
+                <span style="color:#34d399; letter-spacing:5px;">黑山國際進出口貿易與精密儀器維修行</span>
+            </div>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="wh-section-title" style="border-left-color: #10b981; background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+                <p class="wh-text-block">東北倉表面上是一家位於反黑組大樓正對面、夾在幾棟老舊商廈中間的<b style="color:#34d399;">「黑山國際進出口貿易與精密儀器維修行」</b>。這裡白天的捲簾門只拉開一半，櫥窗裡擺著舊打字機、老式沖印相機和倒閉工廠的測量儀。因為就在反黑組大樓對面，街上每天停滿警車，普通黑道連路過都要繞著走。這地方，是全鳴市最完美的盾牌。</p>
+                <p class="wh-text-block">這群人在據點內常年維持著低照明，所有人不論白天黑夜，只要踏出內室必定配戴面罩或特製墨鏡，這也是<b style="color:#34d399;">「見光死部隊」</b>名號的由來。</p>
+
+                <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.3); border-left: 4px solid #10b981; padding: 20px; margin: 20px 0;">
+                    <h4 style="color:#34d399; margin-top:0; margin-bottom:10px; font-family: monospace;">[ 內部指揮鏈 : 歐式特種作戰 ]</h4>
+                    <p style="color:#94a3b8; margin-bottom: 10px; font-size: 0.95rem;">吳諾昊帶著濃重的普魯士軍人作風，將東北倉打造成了一個軍事小組：</p>
+                    <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li><b style="color:#6ee7b7;">現場與紀律官（聆風負責）：</b> 作為坐館，是吳諾昊意志的執行者。負責將嚴苛的「歐式戰術手冊」翻譯成適應鳴市街頭的特種行動方案。</li>
+                        <li><b style="color:#6ee7b7;">技術與環境控制（稜鏡 / 蜃影負責）：</b> 負責維持據點及行動半徑內的「光學與電磁真空狀態」，確保團隊在警方眼皮下進出形同幽靈。</li>
+                    </ul>
+                    <p style="color:#94a3b8; margin-top: 10px; font-size: 0.9rem;">> 核心業務：<b>「在重重保護下生擒目標，且不驚動警方」</b>。行動時不開一槍，幾秒內把人塞進儀器箱運走。</p>
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #10b981; background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent); color: #e5e7eb;">二、 核心隊員 ❘ 跨國幽靈部隊</div>
+
+                <div class="wh-member-grid">
+
+                    <div class="wh-member-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(16, 185, 129, 0.3);">聆風 <span>東北倉坐館 / 親傳徒弟</span></h4>
+                        <ul>
+                            <li><b>外貌氣質：</b> 澳葡混血，膚色蒼白，眼神死寂。常戴戰術口罩與兜帽。精通<b>葡萄牙格鬥術(Jogo do Pau)與現代特種近身格鬥(CQC)</b>。</li>
+                            <li><b>戰術風格：</b> 步伐無聲，能配合環境雜音掩蓋心跳。擅用<b>高強度凱芙拉纖維絞殺繩</b>，在黑暗中切入死角無聲窒息敵人。</li>
+                            <li><b>習慣：</b> 出動前會用葡萄牙語低聲祈禱，儘管從不認為自己會上天堂。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(16, 185, 129, 0.3);">鬼蝠 <span>夜間潛入專家 ❘ 丹麥</span></h4>
+                        <ul>
+                            <li><b>生理特徵：</b> 患白化症，極度畏光。聽覺經軍工手術改裝，能發射超高頻微弱聲波。</li>
+                            <li><b>技術特長：</b> 盲操大師。完全無光環境下，透過聲波反彈震動，在腦海勾勒五十米內物體與敵人心跳精確位置。</li>
+                            <li><b>裝備：</b> 配備<b>氣動無聲擊昏槍</b>，黑夜裡最恐怖的點殺手。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(16, 185, 129, 0.3);">稜鏡 <span>光學偽裝大師 ❘ 南韓</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 身材高挑，冷酷，對美學有偏執追求。穿著覆滿細小鱗片的灰黑色戰術連身服。</li>
+                            <li><b>技術特長：</b> 戰服為東倉阿熙改造的<b>「動態光線折射衣」</b>。利用多面折射與背投技術，與環境陰影完全同色達至「隱形」。</li>
+                            <li><b>戰術定位：</b> 擅長佈置視覺欺騙矩陣，引誘追兵走入死胡同。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(16, 185, 129, 0.3);">蜃影 <span>電磁干擾師 ❘ 台灣</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 團隊唯一的技術宅，神經質，日常嚼檳榔，不停調試無線電發射器。</li>
+                            <li><b>戰術定位：</b> 戰場屏蔽器。動手前釋放<b>「蜃氣」系統</b>——複合微波干擾儀。能癱瘓熱成像、警方無線電，並偽造假GPS。警方監控只會看到幾秒綠屏，實則已完成抓捕。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(16, 185, 129, 0.3);">百目 <span>視覺監控與追蹤 ❘ 烏克蘭</span></h4>
+                        <ul>
+                            <li><b>外貌特點：</b> 東歐前偵察兵。右眼瞎了，換成<b>軍用電子義眼</b>。常年坐在閣樓面對幾十個監控螢幕。</li>
+                            <li><b>技術特長：</b> 擁有「絕對視覺記憶」。見過一面，就能在幾秒內從全市監控甚至反黑組天眼系統中鎖定軌跡。</li>
+                            <li><b>戰術定位：</b> 透過戰術眼鏡實時傳輸數據給外勤，擔任團隊的「上帝之眼」。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(16, 185, 129, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(16, 185, 129, 0.3);">斯庫克 <span>環境陷阱佈置師 ❘ 西班牙</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 滿臉鬍渣的老兵，本名塞爾吉奧 (Scout)。幽默但動手極其殘忍。</li>
+                            <li><b>技術特長：</b> 空間掌控者。隨身攜帶微壓片、高壓電擊針、強力黏著導線等零件。能將普通辦公室改造成「走錯一步即觸發高壓電或切斷腳筋」的致命棋盤。</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #10b981; background: linear-gradient(90deg, rgba(16, 185, 129, 0.1), transparent); color: #e5e7eb;">三、 「大樓對峙」與生存潛規則</div>
+                <div style="background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(16, 185, 129, 0.5); padding: 25px;">
+                    <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li style="margin-bottom:15px;"><b>「送功績」的共生關係：</b> 東北倉就在反黑組對面，維持著詭異的平衡。東北倉抓獲踩底線的江湖敗類後，會打斷四肢、塞上口，丟在反黑組後門垃圾桶旁，附上完整證據。反黑組平白撿了大案功績，自然對維修行睜一隻眼閉一隻眼。</li>
+                        <li style="margin-bottom:15px;"><b>國際背景與反向清洗：</b> 隊員全非本地人，背負歐洲古老情報機構的跨國通緝令。他們忠誠於吳諾昊，因為灰港能提供完美的「身份清洗」與庇護。</li>
+                        <li><b>東北倉的鋼鐵律令：</b> <b style="color:#34d399;">「絕對靜默」</b>。吳諾昊規定，隊員在街頭不允許與本地幫派有私人恩怨、不允許去酒吧蹦迪、不允許與任何人發生情感糾葛。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div id="wh-southeast" class="wh-content-container" style="display:none; border-color: #f59e0b; background: #17120a;">
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background-image: repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(245, 158, 11, 0.02) 40px, rgba(245, 158, 11, 0.02) 80px); pointer-events: none; z-index: 0;"></div>
+
+            <div class="wh-header" style="border-bottom-color: rgba(245, 158, 11, 0.3); position: relative; z-index: 1;">
+                <div style="font-family: monospace; color:#f59e0b; letter-spacing:3px; margin-bottom:10px;">> LOGISTICS_SECURED // SOUTHEAST_WAREHOUSE</div>
+                <h2 style="color:#fef3c7; text-shadow: 0 0 15px rgba(245, 158, 11, 0.5);">東南倉</h2>
+                <span style="color:#fbbf24; letter-spacing:5px;">聯港現代物資流轉與冷鏈倉儲中心</span>
+            </div>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="wh-section-title" style="border-left-color: #f59e0b; background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+                <p class="wh-text-block">東南倉表面上是一家佔地數萬平方公尺的<b style="color:#fbbf24;">「聯港現代物資流轉與冷鏈倉儲中心」</b>。這裡白天有幾十輛重型集裝箱卡車、叉車進出，掛著「生鮮冷鏈」、「鋼材外貿」的招牌。因為距離灰港東南碼頭總部只有十公里，這裡實際上是整個灰港的<b style="color:#fbbf24;">「戰略大後方」與「軍需總庫」</b>。</p>
+                <p class="wh-text-block">這裡的地下擁有與防空洞連通的自動化重型庫房，恆溫恆濕。外界以為阿慶只是個管倉庫的「老實人」，但實際上，他手裡握著能發動一場小型局部戰爭的全部物資流轉權。</p>
+
+                <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.3); border-left: 4px solid #f59e0b; padding: 20px; margin: 20px 0;">
+                    <h4 style="color:#fbbf24; margin-top:0; margin-bottom:10px; font-family: monospace;">[ 內部指揮鏈 : 大後方鐵壁 ]</h4>
+                    <p style="color:#94a3b8; margin-bottom: 10px; font-size: 0.95rem;">陳紹慶（阿慶）的管理風格極具人情味，把倉庫當成一個大家庭，但規矩極嚴：</p>
+                    <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li><b style="color:#fcd34d;">庫房總管與大管家（種子庫負責）：</b> 作為坐館，負責所有物資編碼、盤點與安全防護。大腦是活地圖，任何改裝防彈衣放在哪個貨架一秒就能找出來。</li>
+                        <li><b style="color:#fcd34d;">動態物流網（輜重負責）：</b> 負責將靜態物資轉化為流動補給，打通前往其餘七個分倉的隱蔽運輸線。</li>
+                    </ul>
+                    <p style="color:#94a3b8; margin-top: 10px; font-size: 0.9rem;">> 如果遇到突發戰況，東南倉能在三十分鐘內為前線小隊送達急需的特定口徑子彈、醫療血漿或防化裝備。</p>
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #f59e0b; background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent); color: #e5e7eb;">二、 直屬部下 ❘ 核心成員檔案</div>
+
+                <div class="wh-member-grid">
+
+                    <div class="wh-member-card" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(245, 158, 11, 0.3);">種子庫 <span>東南倉坐館 / 親傳徒弟</span></h4>
+                        <ul>
+                            <li><b>外貌特點：</b> 穿藍色工作服，手持工業平板，像一絲不苟的倉儲經理。有嚴重強迫症，容不得物資擺放歪斜。</li>
+                            <li><b>江湖手段：</b> 數據狂人。種子庫還封存各類違禁品基因庫與特殊合金配方。精通自動化防禦，有人強闖能操縱重型叉車和鋼鐵防護門將敵人夾碎。</li>
+                            <li><b>習慣：</b> 睡前親自對核心彈藥庫物理巡檢。誰敢在倉庫抽菸，會被他用扳手開瓢。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(245, 158, 11, 0.3);">輜重 <span>運輸專員 / 活導航</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 皮膚黝黑，穿多口袋工裝背心。鳴市地下飆車黨見到他都要叫一聲「車神」。</li>
+                            <li><b>技術特長：</b> 掌管由重卡、廂型車、快艇組成的隱蔽運輸隊。對鳴市交通網絡（含未開放高速、地下水道）瞭如指掌。</li>
+                            <li><b>戰術風格：</b> 開車極穩，擅長「影子運輸」——利用卡車視覺盲區和紅綠燈時差，在天眼監控下憑空消失。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(245, 158, 11, 0.3);">行灶 <span>後勤補給師 / 大姐頭</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 中年女性，大嗓門，潑辣熱情。常年在大食堂掌勺，對兄弟極好，受傷了必定有她熬的雞湯。</li>
+                            <li><b>技術特長：</b> 精通<b>「戰術營養學」與「應急野外口糧製作」</b>。研發的壓縮乾糧熱量極高，且含短時間提神止痛成分。</li>
+                            <li><b>定位：</b> 掌管緊急醫療物資和血庫，是灰港的「戰地天使」。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(245, 158, 11, 0.3);">縫窮 <span>裝備修復與改裝專家</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 年輕女孩，內向，耳朵夾著針線，身上有皮革與機油味。</li>
+                            <li><b>技術特長：</b> 一雙巧手化腐朽為神奇。維護所有防彈衣、頭盔與防毒面具。精通<b>凱芙拉纖維與防彈陶瓷</b>的編織修復。</li>
+                            <li><b>改裝能力：</b> 經她改良的戰術背心重量減輕20%，防彈提升一級。能將微型防禦機關縫進西裝內襯。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(245, 158, 11, 0.3);">鋪兵 <span>鋼鐵護衛 / 武裝押運師</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 沉默寡言前雇傭兵，眼神堅毅，身材結實。明面上的保衛科長。</li>
+                            <li><b>戰術定位：</b> 負責倉庫物理安全及高價值押運。精通<b>陣地防禦戰與重火力壓製</b>。</li>
+                            <li><b>信念：</b> 日常帶領防暴隊員配備重火力巡邏。在他眼裡倉庫就是陣地，除非他死，誰也別想帶走一顆子彈。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(245, 158, 11, 0.3);">甘遂 <span>毒物與藥劑專家 ❘ 黑夜藥劑師</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 清秀但氣質陰冷。常年待在冷鏈倉庫深處的無菌實驗室，說話聲音細小。</li>
+                            <li><b>技術特長：</b> 專精臨床藥理與毒物學。調配的鎮定劑能讓狂暴目標一秒失去反抗能力且不傷大腦。研發的廣譜解毒劑是外勤必備救命藥。</li>
+                            <li><b>傳聞：</b> 配置的「慢性誠實藥劑」，效果比東北倉的刑訊手段還要乾淨高效。</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #f59e0b; background: linear-gradient(90deg, rgba(245, 158, 11, 0.1), transparent); color: #e5e7eb;">三、 鐵壁防禦與江湖地位</div>
+                <div style="background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(245, 158, 11, 0.5); padding: 25px;">
+                    <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li style="margin-bottom:15px;"><b>「平時收得深，動時驚死人」：</b> 雖掛非戰鬥型牌子，但人人都是阿慶帶出的老兵精英。圍牆內藏鋼板，所有起重機隨時可變阻擋裝甲車的障礙。阿慶常說：<b style="color:#fbbf24;">「我們不主動打人，但誰敢來搶糧，老把他當打包送去西南倉給阿濤吧。」</b></li>
+                        <li style="margin-bottom:15px;"><b>八倉聯動的「臍帶」：</b> 北倉需化學原料，南倉需保養鈍器，東區需伺服器冷卻液，西倉需香菸好酒，皆由這裡出貨。</li>
+                        <li><b>東南倉的底線：</b> <b style="color:#fbbf24;">「賬目乾淨，物資救命」</b>。哪怕一顆螺絲釘都要對得上帳。遇重大災荒或動亂，在不違反沙祁川原則前提下，會秘密調撥民用物資救濟西區街坊，這份低調善舉為灰港在民間積累極深福報。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="wh-southwest" class="wh-content-container" style="display:none; border-color: #dc2626; background: #0f0505;">
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 50% 50%, rgba(220, 38, 38, 0.03) 0%, transparent 80%); pointer-events: none; z-index: 0;"></div>
+
+            <div class="wh-header" style="border-bottom-color: rgba(220, 38, 38, 0.3); position: relative; z-index: 1;">
+                <div style="font-family: monospace; color:#dc2626; letter-spacing:3px; margin-bottom:10px;">> ERASURE_PROTOCOL // SOUTHWEST_WAREHOUSE</div>
+                <h2 style="color:#fee2e2; text-shadow: 0 0 15px rgba(220, 38, 38, 0.6);">西南倉</h2>
+                <span style="color:#f87171; letter-spacing:5px;">現代化無害化寵物殯葬與標本製作中心</span>
+            </div>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="wh-section-title" style="border-left-color: #dc2626; background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+                <p class="wh-text-block">西南倉表面上是一家位於西南區市郊、緊鄰公墓與荒山的<b style="color:#f87171;">「現代化無害化寵物殯葬與標本製作中心」</b>。這裡長年大門緊閉，高聳的煙囪偶爾冒出幾縷無色無味的熱氣。周邊方圓一公里內幾乎沒有居民，只有滿山的槐樹與寂靜。這種極度隱蔽且自帶死亡陰影的地段，完美地掩護了灰港最核心的「清道夫」部隊。</p>
+                <p class="wh-text-block">這裡不對外開放，內部乾淨得近乎病態，亮白色的無塵走廊、福馬林的氣味與高規格的負壓排氣系統，讓這裡看起來更像一個法醫鑑定中心。</p>
+
+                <div style="background: rgba(220, 38, 38, 0.05); border: 1px solid rgba(220, 38, 38, 0.3); border-left: 4px solid #dc2626; padding: 20px; margin: 20px 0;">
+                    <h4 style="color:#f87171; margin-top:0; margin-bottom:10px; font-family: monospace;">[ 內部指揮鏈 : 消除存在 ]</h4>
+                    <p style="color:#94a3b8; margin-bottom: 10px; font-size: 0.95rem;">陸永濤（阿濤）是個情感極度稀薄的人。西南倉運作嚴格遵循「不插手、不圍觀、不評價」的三不原則：</p>
+                    <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li><b style="color:#fca5a5;">現場清洗調度（歸塵負責）：</b> 作為坐館，是現場最高指揮。負責帶隊在戰鬥結束後第一時間切入，將「無痕美學」在現實中執行到極致。</li>
+                        <li><b style="color:#fca5a5;">技術與痕跡監控（洗山 / 漉囊負責）：</b> 實驗室改良化學藥劑與除味配方，實時逆向推演警方最新鑑識技術，確保永遠走在警方前面。</li>
+                    </ul>
+                    <p style="color:#94a3b8; margin-top: 10px; font-size: 0.9rem;">> 從提著銀色金屬箱踏入現場，到整隊撤離，通常不超過四十分鐘。</p>
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #dc2626; background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent); color: #e5e7eb;">二、 直屬部下 ❘ 核心成員檔案</div>
+
+                <div class="wh-member-grid">
+
+                    <div class="wh-member-card" style="border-color: rgba(220, 38, 38, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(220, 38, 38, 0.3);">歸塵 <span>西南倉坐館 / 親傳徒弟</span></h4>
+                        <ul>
+                            <li><b>外貌氣質：</b> 身形修長，面容清秀無血色。穿貼身黑色防水風衣與醫用乳膠手套，眼神如枯井。</li>
+                            <li><b>江湖手段：</b> 恐怖的「現場逆向推演能力」。看一眼血跡彈孔即能復原戰鬥過程，精準找到飛濺血滴定向銷毀。</li>
+                            <li><b>習慣：</b> 幹活絕不說話，全靠複雜手勢指揮。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(220, 38, 38, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(220, 38, 38, 0.3);">拾骸 <span>遺體處理與現場復原</span></h4>
+                        <ul>
+                            <li><b>性格背景：</b> 前資深入殮師與整容師。性格沉穩，對死人比活人有耐心。</li>
+                            <li><b>技術特長：</b> 掌管核心<b>特製高溫焚化爐與低溫溶解槽</b>，讓有機組織數小時變無機液體。能將屍體偽造成意外失火或溺水狀態。</li>
+                            <li><b>口頭禪：</b> 「塵歸塵，土歸土，我送各位回歸黃土。」</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(220, 38, 38, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(220, 38, 38, 0.3);">夜不收 <span>深夜行動專家 / 哨兵</span></h4>
+                        <ul>
+                            <li><b>生理特徵：</b> 嚴重日光性皮炎，僅黃昏深夜活動。眼神在黑暗中反射微光如夜貓。</li>
+                            <li><b>戰術定位：</b> 黑暗守護者。配備<b>軍用三目夜視鏡與無聲弩箭</b>。外圍警戒，精準點殺任何接近現場的目擊者。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(220, 38, 38, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(220, 38, 38, 0.3);">洗山 <span>生物痕跡消除 / 化學魔女</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 鯊魚夾亂髮，戴厚重護目鏡，散發漂白水與薄荷味。偏執喜愛強酸強鹼與溶劑。</li>
+                            <li><b>技術特長：</b> 獨門配方<b>「洗山水」</b>。數秒內分解DNA、血紅素，不損環境紋理。經她擦拭，警方魯米諾試劑無法檢測出任何血跡反應。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(220, 38, 38, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(220, 38, 38, 0.3);">笤帚 <span>痕跡物證抹除師</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 拿著掃帚的老頭，在殯葬中心打掃衛生，存在感極低。</li>
+                            <li><b>技術特長：</b> 「微觀物理學」大師。使用微型高功率吸塵器、特製靜電滾輪與光譜儀。清理指紋、衣物纖維、毛髮與泥土。經手現場不留一粒不屬於該房間的灰塵。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(220, 38, 38, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(220, 38, 38, 0.3);">漉囊 <span>液體與氣體痕跡處理師</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 氣質冷艷，常配戴防毒面具，聲音悶啞。</li>
+                            <li><b>戰術定位：</b> 現場清洗最後工序。使用<b>高壓霧化除味劑與空氣負壓抽吸裝置</b>，一刻鐘內置換空氣，消除血腥硝煙與毒素，甚至製造「新房氣味」掩蓋異樣。</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #dc2626; background: linear-gradient(90deg, rgba(220, 38, 38, 0.1), transparent); color: #e5e7eb;">三、 江湖哲學與不涉恩怨</div>
+                <div style="background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(220, 38, 38, 0.5); padding: 25px;">
+                    <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li style="margin-bottom:15px;"><b>江湖最怕的「拜訪」：</b> 沒有人想驚動西南倉。被其他倉處理至少知道死了，西南倉出手，你在世上留下的所有痕跡（含銀行賬戶與肉體）皆被抹淨，變為「失蹤者」，彷彿從未出生過。</li>
+                        <li style="margin-bottom:15px;"><b>跨倉合作的「終結者」：</b> 北倉炸完街，歸塵去收尾防殘留；南倉打完架，拾骸接走「廢料」。他們是所有人最堅實的後盾。</li>
+                        <li><b>西南倉的鐵律：</b> <b style="color:#dc2626;">「不問因果，不留活口」</b>。阿濤定下死理：我們是工具不是法官。只要踏入現場，所有人都是需要被擦掉的「污漬」。若發現重傷未死倖存者，西南倉不會救治，會補上一針無痛鎮定劑將其一同「歸塵」。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="wh-northwest" class="wh-content-container" style="display:none; border-color: #b91c1c; background: #140d0d;">
+            <div style="position:absolute; top:0; left:0; width:100%; height:100%; background: radial-gradient(circle at 50% 100%, rgba(185, 28, 28, 0.05) 0%, transparent 80%); pointer-events: none; z-index: 0;"></div>
+
+            <div class="wh-header" style="border-bottom-color: rgba(185, 28, 28, 0.3); position: relative; z-index: 1;">
+                <div style="font-family: monospace; color:#b91c1c; letter-spacing:3px; margin-bottom:10px;">> HEAVY_SUPPRESSION // NORTHWEST_WAREHOUSE</div>
+                <h2 style="color:#fecaca; text-shadow: 0 0 15px rgba(185, 28, 28, 0.6);">西北倉</h2>
+                <span style="color:#ef4444; letter-spacing:5px;">遠大重型路橋工程與廢棄水泥攪拌廠</span>
+            </div>
+
+            <div style="position: relative; z-index: 1;">
+                <div class="wh-section-title" style="border-left-color: #b91c1c; background: linear-gradient(90deg, rgba(185, 28, 28, 0.1), transparent); color: #e5e7eb;">一、 倉儲架構與運作邏輯</div>
+                <p class="wh-text-block">西北倉表面上是一家位於西北荒漠地帶邊緣、佔地極廣的<b style="color:#ef4444;">「遠大重型路橋工程與廢棄水泥攪拌廠」</b>。這裡方圓數公里都是砂石路與亂石崗，巨型水泥罐、滿是鐵鏽的重型推土機和高聳的砂石堆成了天然的防護屏障。這裡白天風沙漫天，重型卡車發出野獸般的咆哮。外界都知道這地方盤踞著一群惹不起的「西北狼」，任何外來車輛只要靠近邊界，就會被高處沙堆裡的暗哨死死釘住。</p>
+                <p class="wh-text-block">這座據點本體是一座由舊防空洞和高強度鋼筋混凝土澆築而成的<b style="color:#ef4444;">鋼鐵要塞</b>。牆體厚達一米，窗戶全部安裝了防彈鋼板與格柵，內部彈藥充足、自成一體，易守難攻到甚至能抵擋火箭筒的正面轟擊。</p>
+
+                <div style="background: rgba(185, 28, 28, 0.05); border: 1px solid rgba(185, 28, 28, 0.3); border-left: 4px solid #b91c1c; padding: 20px; margin: 20px 0;">
+                    <h4 style="color:#ef4444; margin-top:0; margin-bottom:10px; font-family: monospace;">[ 內部指揮鏈 : 狼群戰術 ]</h4>
+                    <p style="color:#94a3b8; margin-bottom: 10px; font-size: 0.95rem;">程磊（阿程）是這群野獸的「頭狼」，他的話就是法。西北倉運作採取「狼群戰術」：</p>
+                    <ul style="line-height: 1.8; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li><b style="color:#fca5a5;">攻堅與衝鋒（狂鋒負責）：</b> 作為坐館，擁有絕對的外勤指揮權。負責帶領狼群撕開敵人的防線。</li>
+                        <li><b style="color:#fca5a5;">後方拷問與防禦（鐵鋦 / 鎮水獸負責）：</b> 負責將抓回來的「獵物」徹底榨乾，並死守大後方，確保西北倉的要塞堅不可摧。</li>
+                    </ul>
+                    <p style="color:#94a3b8; margin-top: 10px; font-size: 0.9rem;">> 承接灰港最硬核的<b>「定點清除」與「跨國/跨境活捉」</b>委託。防守戰時則由鎮水獸接管權限，將建築變成絞肉機。</p>
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #b91c1c; background: linear-gradient(90deg, rgba(185, 28, 28, 0.1), transparent); color: #e5e7eb;">二、 直屬部下 ❘ 核心成員檔案</div>
+
+                <div class="wh-member-grid">
+
+                    <div class="wh-member-card" style="border-color: rgba(185, 28, 28, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(185, 28, 28, 0.3);">狂鋒 <span>西北倉坐館 / 親傳徒弟</span></h4>
+                        <ul>
+                            <li><b>外貌氣質：</b> 鏟平的狼頭造型，雙臂滿疤痕。平日暴躁嗜酒，拿到槍瞬間進入冷酷「戮殺狀態」。</li>
+                            <li><b>戰術風格：</b> 鳴市最強巷戰與衝鋒隊長。精通<b>雙持散彈槍近距離接敵</b>。衝鋒如野豬，利用重火力打碎掩體鑿穿防線。</li>
+                            <li><b>習慣：</b> 衝鋒時戴獠牙圖案戰術防彈面具，人稱「瘋狗阿鋒」。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(185, 28, 28, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(185, 28, 28, 0.3);">木枷 <span>抓捕與囚禁專家 / 鐵娘子</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 面容冷峻，長髮緊實馬尾，眼神如鷹。性格沉穩古板，有強迫症。</li>
+                            <li><b>技術特長：</b> 活捉專家。精通解剖學與關節卸載，切入死角打斷四肢。配備<b>高強度阻燃網槍、鈦合金手銬與神經毒素電擊槍</b>。</li>
+                            <li><b>日常：</b> 管理地下水牢與禁閉室。設計的牢房連蒼蠅都飛不出。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(185, 28, 28, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(185, 28, 28, 0.3);">鐵鋦 <span>刑訊與審問專家 / 閻王判官</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 陰沉，穿滿是倒鉤與工具的厚重皮圍裙。話少，帶鐵鏽血腥味。</li>
+                            <li><b>技術特長：</b> 老派審訊大師。信奉<b>「用對工具，痛覺沒有極限」</b>。手段粗暴，擅用電焊槍、拔釘鉗與高壓鹽水。江湖大佬撐不過十分鐘。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(185, 28, 28, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(185, 28, 28, 0.3);">轡頭 <span>目標控制專員 / 馱馬</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 魁梧背駝，手臂粗如象腿。智商不高但執行力100%。極其耐打。</li>
+                            <li><b>戰術定位：</b> 扛著<b>重型防暴防彈盾牌</b>強行切入，將目標像老鷹抓小雞般甩在背上，在重火力掩護下強行帶走。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(185, 28, 28, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(185, 28, 28, 0.3);">鼬 <span>特種環境作戰專家</span></h4>
+                        <ul>
+                            <li><b>性格外貌：</b> 瘦小靈活，穿連身工裝。性格神經質，喜歡嘴裡叼鐵釘。</li>
+                            <li><b>技術特長：</b> CQB女王。對地下礦道、防空洞、通風管道瞭如指掌。繞到敵人背後用<b>高溫軍用割刀</b>割喉。死角永遠不安全。</li>
+                        </ul>
+                    </div>
+
+                    <div class="wh-member-card" style="border-color: rgba(185, 28, 28, 0.4); background: rgba(0, 0, 0, 0.6);">
+                        <h4 style="border-bottom-color: rgba(185, 28, 28, 0.3);">鎮水獸 <span>要塞防禦大師 / 最後的牆</span></h4>
+                        <ul>
+                            <li><b>性格特點：</b> 五十多歲白髮老兵，平時負責看大門。眼神沉穩，與程磊有過命交情。</li>
+                            <li><b>戰術定位：</b> 專精據點守衛與反突襲。幾秒內啟動整棟建築的<b>防禦矩陣</b>(遙控地雷、鋼板隔絕門)。精通<b>重機槍與定點交叉火力</b>，扣住扳機即是無法逾越的鬼門關。</li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <div class="wh-section-title" style="border-left-color: #b91c1c; background: linear-gradient(90deg, rgba(185, 28, 28, 0.1), transparent); color: #e5e7eb;">三、 江湖地位與生存法則</div>
+                <div style="background: rgba(0, 0, 0, 0.6); border: 1px dashed rgba(185, 28, 28, 0.5); padding: 25px;">
+                    <ul style="line-height: 2; color:#d1d5db; padding-left:20px; margin:0;">
+                        <li style="margin-bottom:15px;"><b>灰港的「矛盾合一」：</b> 灰港武力的最高峰。南倉是盾，北倉是尖刀，西北倉自己就是一套「矛與盾」。當遇到無法解決的硬骨頭，或有勢力試圖剷除灰港時，沙祁川就會放出這群餓狼。</li>
+                        <li style="margin-bottom:15px;"><b>野獸的「領地意識」：</b> 走私客、越境悍匪經過攪拌廠方圓五公里，必須下車熄火點煙致敬。誰敢在西北狼領地見血，程磊會帶著狂鋒一路追殺到天涯海角。</li>
+                        <li><b>西北倉的鐵律：</b> <b style="color:#ef4444;">「不出則已，出則飲血」</b>。不輕易開拔，但只要踏入市中心，意味著委託到了必須「斬草除根」的地步。除了生擒目標，其餘擋路者一律不留活口。這是灰港多年不受挑釁的絕對底牌。</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- 你可以繼續在這裡複製 #wh-south 的結構，改成 wh-east, wh-west 等等 -->
+
+    </div>
+
 
             <script>
           
@@ -6288,6 +7146,26 @@
         }
 
             
+        // 開啟灰港分倉詳細覆蓋層
+        function openWarehouse(whId) {
+            // 先隱藏所有分倉內容
+            const contents = document.querySelectorAll('.wh-content-container');
+            contents.forEach(content => content.style.display = 'none');
+            
+            // 顯示被點擊的分倉內容
+            const target = document.getElementById(whId);
+            if(target) target.style.display = 'block';
+            
+            // 顯示黑色背景覆蓋層並鎖定底層滾動
+            document.getElementById('warehouse-overlay').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        // 關閉灰港分倉詳細覆蓋層
+        function closeWarehouse() {
+            document.getElementById('warehouse-overlay').classList.remove('active');
+            document.body.style.overflow = ''; // 恢復底層滾動
+        }
 
 
     
